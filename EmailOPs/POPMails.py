@@ -3,6 +3,8 @@
 import sys # Could also pass gmail address and password via sys.argv[]
 from getpass import getpass # Getpass.getpass() function is used for entering password invisibly
 import poplib # POP protocol client
+import email
+import email.generator
 
 # Input gmail address like 'username@gmail.com'
 gmailAddr = raw_input('Gmail Address:')
@@ -39,6 +41,15 @@ details = recvServer.retr(mailboxStatus[0])[1] # Return (response, [line, ...], 
 # After completely join action, email message string is gained.
 s = '\r\n'.join(details)
 
+'''
 # write email message string into email message file so-called
 with open('email_latest', 'w') as fp: # when use 'with...as' statement, user avoid calling fp.close() explicitly
     fp.write(s)
+'''
+
+# generate flat text of email message represented by email message object structure
+# use email.generator.Generator(outfp).flatten(msg)
+msg = email.message_from_string(s)
+with open('email_latest', 'w') as outfp:
+    gen = email.generator.Generator(outfp)
+    gen.flatten(msg)
