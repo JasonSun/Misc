@@ -33,6 +33,12 @@ print mailboxStatus
 
 # Retrieve the ith mail details using retr() function and the first mail returned in this example
 # Details need to be parsed using EMAIL module
-details = recvServer.retr(1)[1] # Return (response, [line, ...], octets)
-for line in details:
-    print line
+details = recvServer.retr(mailboxStatus[0])[1] # Return (response, [line, ...], octets)
+
+# Be sure to join line list with newline'\r\n' symbol
+# After completely join action, email message string is gained.
+s = '\r\n'.join(details)
+
+# write email message string into email message file so-called
+with open('email_latest', 'w') as fp: # when use 'with...as' statement, user avoid calling fp.close() explicitly
+    fp.write(s)
