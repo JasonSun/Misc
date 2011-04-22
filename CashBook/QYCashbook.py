@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os.path
 import wx
 import wx.grid
 from datetime import datetime
@@ -14,7 +15,7 @@ class CashbookFrame(wx.Frame):
         self.createMenuBar()
         # Create entry header like 'Date' 'Expense' 'Comment' 'Total'
         self.createGrid()
-        # Cashbook instance
+        # Create instance of Cashbook
         self.cb = Cashbook()
     
     def createMenuBar(self):
@@ -29,10 +30,12 @@ class CashbookFrame(wx.Frame):
         self.fileMenu = wx.Menu()
         self.menuBar.Append(self.fileMenu, 'File')
         # Add menu item to File menu
+        openItem = self.fileMenu.Append(wx.ID_OPEN, 'Open', 'Open an existing cashbook file')
         saveItem = self.fileMenu.Append(wx.ID_SAVE, 'Save', 'Save these entries into a file')
         saveasItem = self.fileMenu.Append(wx.ID_SAVEAS, 'Save As', 'Save these entries into a new file')
         exitItem = self.fileMenu.Append(wx.ID_EXIT, 'Exit', 'Exit Cashbook')
         # Bind event handler to event in File menu
+        self.Bind(wx.EVT_MENU, self.onOpen, openItem)
         self.Bind(wx.EVT_MENU, self.onSave, saveItem)
         self.Bind(wx.EVT_MENU, self.onSaveas, saveasItem)
         self.Bind(wx.EVT_MENU, self.onExit, exitItem)
@@ -89,7 +92,7 @@ class CashbookFrame(wx.Frame):
                 for i in range(row + 1, self.grid.GetNumberRows()):
                     self.cb[i].setTotal(self.cb[i - 1].getTotal() + self.cb[i].getExpense())
             else:
-                entry.setTotal(self.cb[row - 1].getTotal() + expense)
+                entry.setTotal(int(self.cb[row - 1].getTotal()) + expense)
                 for i in range(row + 1, self.grid.GetNumberRows()):
                     self.cb[i].setTotal(self.cb[i - 1].getTotal() + self.cb[i].getExpense())
             for i in range(row, self.grid.GetNumberRows()):
@@ -98,13 +101,47 @@ class CashbookFrame(wx.Frame):
             comment = self.grid.GetCellValue(row, col)
             entry.setComment(comment)
 
-    def onSave(self, event):
-        fileName = str(datetime.now()).split()[0] + '.txt'
-        with open(fileName, 'w') as f:
+    def onOpen(self, event):
+        self.cb.isFromFile = True
+        dlg = wx.FileDialog(self, 'Open', '', '', '*.txt', wx.FD_OPEN)
+        if dlg.ShowModal() == wx.ID_OK:
+            fileName = dlg.GetFilename()
+            dir = dlg.GetDirectory()
+            filePath = os.path.join(dir, fileName)
+            with open(filePath, 'r') as f:
+                lines = f.readlines()
+            for i in lines:
+                l = i.split('\n')[0].split('+++')
+                expense = l[0]
+                comment = l[1]
+                total = l[2]
+                ent = Entry()
+                ent.setExpense(expense)
+                ent.setComment(comment)
+                ent.setTotal(total)
+                self.cb.appendEntry(ent)
+            self.grid.AppendRows(len(self.cb))
+            self.grid.SetCellValue(0, 0, fileName.split('.')[0])
             for i in range(len(self.cb)):
-                f.write(str(self.cb[i].getExpense()) + \
-                        '+++' + self.cb[i].getComment() + \
-                        '+++' + str(self.cb[i].getTotal()) + '\n')
+                self.grid.SetCellValue(i, 1, self.cb[i].getExpense())
+                self.grid.SetCellValue(i, 2, self.cb[i].getComment())
+                self.grid.SetCellValue(i, 3, self.cb[i].getTotal())
+
+    def onSave(self, event):
+        if not self.cb.isFromFile:
+            fileName = str(datetime.now()).split()[0] + '.txt'
+            with open(fileName, 'w') as f:
+                for i in range(len(self.cb)):
+                    f.write(str(self.cb[i].getExpense()) + \
+                            '+++' + self.cb[i].getComment() + \
+                            '+++' + str(self.cb[i].getTotal()) + '\n')
+        else:
+            fileName = self.grid.GetCellValue(0, 0) + '.txt'
+            with open(fileName, 'w') as f:
+                for i in range(len(self.cb)):
+                    f.write(str(self.cb[i].getExpense()) + \
+                            '+++' + self.cb[i].getComment() + \
+                            '+++' + str(self.cb[i].getTotal()) + '\n')
 
     def onSaveas(self, event):
         pass
@@ -121,9 +158,9 @@ class CashbookFrame(wx.Frame):
         if row < 0: return
         dlg = wx.MessageDialog(self, 'Are you sure to delete entry %d?' % row, 'Delete Entry', wx.YES_NO)
         if dlg.ShowModal() == wx.ID_YES:
-            expense = self.cb[row].getExpense()
+            expense = int(self.cb[row].getExpense())
             for i in range(row + 1, self.grid.GetNumberRows()):
-                self.cb[i].setTotal(self.cb[i].getTotal() - expense)
+                self.cb[i].setTotal(int(self.cb[i].getTotal()) - expense)
                 self.grid.SetCellValue(i, 3, str(self.cb[i].getTotal()))
             self.grid.DeleteRows(row)
             del self.cb[row]
@@ -141,6 +178,7 @@ class CashbookFrame(wx.Frame):
 class Cashbook:
     def __init__(self):
         self.entries = []
+        self.isFromFile = False
 
     def __getitem__(self,i):
         return self.entries[i]
