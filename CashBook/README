@@ -1,2 +1,5 @@
 This is a simple cross-platform personal financial tool written in Python.
 It is used as a cash book for QiongQiong(my girlfriend). HAHA...
+
+Feel free to download. Make sure you have python and wxPython installed.
+$ python QYCashbook.py
