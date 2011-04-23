@@ -32,12 +32,12 @@ class CashbookFrame(wx.Frame):
         # Add menu item to File menu
         openItem = self.fileMenu.Append(wx.ID_OPEN, 'Open', 'Open an existing cashbook file')
         saveItem = self.fileMenu.Append(wx.ID_SAVE, 'Save', 'Save these entries into a file')
-        saveasItem = self.fileMenu.Append(wx.ID_SAVEAS, 'Save As', 'Save these entries into a new file')
+        closeItem = self.fileMenu.Append(wx.ID_CLOSE, 'Close', 'Close the current cashbook file')
         exitItem = self.fileMenu.Append(wx.ID_EXIT, 'Exit', 'Exit Cashbook')
         # Bind event handler to event in File menu
         self.Bind(wx.EVT_MENU, self.onOpen, openItem)
         self.Bind(wx.EVT_MENU, self.onSave, saveItem)
-        self.Bind(wx.EVT_MENU, self.onSaveas, saveasItem)
+        self.Bind(wx.EVT_MENU, self.onClose, closeItem)
         self.Bind(wx.EVT_MENU, self.onExit, exitItem)
 
     def createEditMenu(self):
@@ -77,29 +77,36 @@ class CashbookFrame(wx.Frame):
         self.grid.SetColSize(3, 150)
         #self.grid.SetSize((500, 300))
 
+    # Display updated grid
+    def onShow(self, cb):
+        for i in range(len(cb)):
+            self.grid.SetCellValue(i, 1, str(cb[i].getExpense()))
+            self.grid.SetCellValue(i, 2, cb[i].getComment())
+            self.grid.SetCellValue(i, 3, str(cb[i].getTotal()))
+    
     def onChange(self, event):
         row = event.GetRow()
         col = event.GetCol()
-        entry = self.cb[row]
         if col == 0:
             date = self.grid.GetCellValue(row, col)
-            entry.setDate(date)
+            self.cb[row].setDate(date)
         elif col == 1:
             expense = int(self.grid.GetCellValue(row, col))
-            entry.setExpense(expense)
+            self.cb[row].setExpense(expense)
             if row == 0:
-                entry.setTotal(expense)
+                self.cb[row].setTotal(expense)
                 for i in range(row + 1, self.grid.GetNumberRows()):
                     self.cb[i].setTotal(self.cb[i - 1].getTotal() + self.cb[i].getExpense())
             else:
-                entry.setTotal(int(self.cb[row - 1].getTotal()) + expense)
+                self.cb[row].setTotal(int(self.cb[row - 1].getTotal()) + expense)
                 for i in range(row + 1, self.grid.GetNumberRows()):
                     self.cb[i].setTotal(self.cb[i - 1].getTotal() + self.cb[i].getExpense())
             for i in range(row, self.grid.GetNumberRows()):
                 self.grid.SetCellValue(i, 3, str(self.cb[i].getTotal()))
         elif col == 2:
             comment = self.grid.GetCellValue(row, col)
-            entry.setComment(comment)
+            self.cb[row].setComment(comment)
+        self.cb.isSaved = False
 
     def onOpen(self, event):
         self.cb.isFromFile = True
@@ -121,11 +128,8 @@ class CashbookFrame(wx.Frame):
                 ent.setTotal(total)
                 self.cb.appendEntry(ent)
             self.grid.AppendRows(len(self.cb))
-            self.grid.SetCellValue(0, 0, fileName.split('.')[0])
-            for i in range(len(self.cb)):
-                self.grid.SetCellValue(i, 1, self.cb[i].getExpense())
-                self.grid.SetCellValue(i, 2, self.cb[i].getComment())
-                self.grid.SetCellValue(i, 3, self.cb[i].getTotal())
+            self.grid.SetCellValue(0, 0, fileName.rstrip('.txt'))
+            self.onShow(self.cb)
 
     def onSave(self, event):
         if not self.cb.isFromFile:
@@ -142,9 +146,24 @@ class CashbookFrame(wx.Frame):
                     f.write(str(self.cb[i].getExpense()) + \
                             '+++' + self.cb[i].getComment() + \
                             '+++' + str(self.cb[i].getTotal()) + '\n')
+        self.cb.isSaved = True
 
-    def onSaveas(self, event):
-        pass
+    def onClose(self, event):
+        if self.cb.isSaved == True:
+            self.grid.DeleteRows(0, self.grid.GetNumberRows())
+            self.cb = Cashbook()
+        else:
+            dlg = wx.MessageDialog(self, 'Do you want to save the current file?', 'Close File', wx.YES_NO|wx.CANCEL)
+            if dlg.ShowModal() == wx.ID_CANCEL:
+                pass
+            elif dlg.ShowModal() == wx.ID_YES:
+                self.onSave()
+                self.grid.DeleteRows(0, self.grid.GetNumberRows())
+                self.cb = Cashbook()
+            else:
+                self.grid.DeleteRows(0, self.grid.GetNumberRows())
+                self.cb = Cashbook()
+            dlg.Destroy()
 
     def onExit(self, event):
         self.Close()
@@ -161,9 +180,9 @@ class CashbookFrame(wx.Frame):
             expense = int(self.cb[row].getExpense())
             for i in range(row + 1, self.grid.GetNumberRows()):
                 self.cb[i].setTotal(int(self.cb[i].getTotal()) - expense)
-                self.grid.SetCellValue(i, 3, str(self.cb[i].getTotal()))
             self.grid.DeleteRows(row)
             del self.cb[row]
+            self.onShow(self.cb)
         dlg.Destroy()
 
     def onAbout(self, event):
@@ -179,6 +198,7 @@ class Cashbook:
     def __init__(self):
         self.entries = []
         self.isFromFile = False
+        self.isSaved = False
 
     def __getitem__(self,i):
         return self.entries[i]
