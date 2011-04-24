@@ -1,7 +1,7 @@
 #pragma  once
 
 /*
-------------------导出函数--------------
+-----------------Export Functions--------------
 */
 
 BOOL  __stdcall XLInitDownloadEngine();
@@ -24,12 +24,12 @@ DWORD __stdcall XLGetErrorMsg(DWORD dwErrorId, LPTSTR pszBuffer, DWORD & dwSize)
 
 
 /*
-----------------------类型定义-----------------
+----------------------Task Status Define-----------------
 */
 enum enumTaskStatus{
-	enumTaskStatus_Connect = 0,                 // 已经建立连接
-	enumTaskStatus_Download = 2,                // 开始下载 
-	enumTaskStatus_Pause = 10,                  // 暂停
-	enumTaskStatus_Success = 11,                // 成功下载
-	enumTaskStatus_Fail = 12,                   // 下载失败
+	enumTaskStatus_Connect = 0,                 // Set up connection
+	enumTaskStatus_Download = 2,                // Start download
+	enumTaskStatus_Pause = 10,                  // Pause
+	enumTaskStatus_Success = 11,                // Download successfully
+	enumTaskStatus_Fail = 12,                   // Download fail
 };
