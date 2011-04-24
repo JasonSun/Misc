@@ -3,3 +3,24 @@ It is used as a cash book for QiongQiong(my girlfriend). HAHA...
 
 Feel free to download. Make sure you have python and wxPython installed.
 $ python QYCashbook.py
+
+Also you can transform python script into .exe file on Windows.
+This is done by using py2exe utility.
+1. Create a setup.py file
+'''
+setup.py
+'''
+from distutils.core import setup
+import py2exe
+
+setup = (
+    windows = [QYCashbook.py],
+    options = {
+        'py2ext' : {
+            'dll_excludes' : ['MSVCP90.dll']
+        }
+    }
+)
+
+2. Execute command below
+python.exe setup.py py2exe
