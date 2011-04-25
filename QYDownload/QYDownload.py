@@ -11,9 +11,9 @@ def QYDownload(dllObject):
 		return XL_ERROR_FAIL
 	else:
 		'''
-        All stuff defined here
-        '''
-        pass
+		All stuff defined here
+		'''
+		pass
 
 if __name__ == '__main__':
 	'''
