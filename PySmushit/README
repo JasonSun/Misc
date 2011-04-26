@@ -1,0 +1,9 @@
+A Python wrapper around Yahoo!'s Smush.it image compression web service.
+Thanks for tylerhall's(https://github.com/tylerhall/smushit-php) contribution to smushit.php.
+
+PySmushit.py is overwritten refering to smushit.php.:)
+
+Reference Links:
+libcurl: http://curl.haxx.se/libcurl/c/
+pycurl: http://pycurl.sourceforge.net/
+pycurl source: http://pycurl.cvs.sourceforge.net/viewvc/pycurl/pycurl/src/pycurl.c?revision=1.150&view=markup
