@@ -1,3 +1,5 @@
+# 正则表达式的使用
+# 'char'.ord => ASCII，ASCII.chr => 'char'，.each_byte => ASCII
 n = gets.to_i
 n.times do
 	str = gets.chomp
