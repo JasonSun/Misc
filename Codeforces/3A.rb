@@ -1,3 +1,4 @@
+# 添加数组元素，直接使用 << 操作符
 source = gets.chomp!
 destination = gets.chomp!
 h = []
