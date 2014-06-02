@@ -1,3 +1,4 @@
+# gets.chomp! .split .strip! hash.delete
 n, m, c = gets.chomp!.split
 n = n.to_i
 m = m.to_i
