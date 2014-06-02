@@ -1,3 +1,4 @@
+# switch..case语句 case..when..when..else..end
 weight = gets.to_i
 if weight < 4
 	case weight
