@@ -1,3 +1,4 @@
+# string的start_with? end_with?
 hash = Hash.new
 bytes = 0
 while line = gets
