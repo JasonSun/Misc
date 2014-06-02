@@ -31,4 +31,5 @@ longest.each do |item|
 		cnt += 1
 	end
 end
+# 输出ruby表达式"#{exp}"
 puts "#{max} #{cnt}"
