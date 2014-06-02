@@ -1,3 +1,4 @@
+# 使用#{}将ruby表达式嵌入到regexp中，不能用双引号引用
 str1 = gets.chomp!
 str2 = gets.chomp!
 str3 = gets.chomp!
