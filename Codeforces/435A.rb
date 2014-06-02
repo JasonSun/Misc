@@ -1,3 +1,5 @@
+# 数组元素的映射操作 map
+# 数组弹出前N个元素 drop n
 n, m = gets.split.map { |item| item.to_i }
 a = gets.split.map { |item| item.to_i }
 bus = 0
