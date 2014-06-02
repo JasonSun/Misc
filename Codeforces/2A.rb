@@ -1,3 +1,7 @@
+# has_key?() == key?()
+# hash.select
+# Hash.new
+
 n = gets.to_i
 ary = []
 hash = Hash.new 0
