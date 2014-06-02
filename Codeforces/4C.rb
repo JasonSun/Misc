@@ -1,3 +1,4 @@
+# hash的初始化，可以是Hash.new，或者直接 {}
 n = gets.to_i
 hash = Hash.new
 n.times do
